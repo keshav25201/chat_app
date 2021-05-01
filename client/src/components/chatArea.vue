@@ -5,7 +5,7 @@
             <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
         </v-avatar>
         <div class="chat-headerInfo">
-            <h3>Kelly</h3>
+            <h3>{{this.$route.params.roomId}}</h3>
         </div>
         <div class="chat-headerIcons">
             <i class="fas fa-search"></i>
@@ -14,12 +14,12 @@
         </div>
     </div>
     <div class="chat-body">
-        <p class="message" v-for="message in messages" :key="message._id">{{message.message}}</p>
+        <p class="message" v-for="message in roomMessages"  :key="message._id">{{message.message}}</p>
     </div>
     <div class="chat-footer">
         <i class="far fa-smile-wink"></i>
-        <form action="">
-             <input type="text" placeholder="type message">
+        <form @submit.prevent="onSubmit">
+             <input type="text" placeholder="type message" v-model="text">
              <button>send</button>
         </form>
        
@@ -29,9 +29,52 @@
 </template>
 
 <script>
+const API_URL = 'http://localhost:3000/api/v1';
 export default {
     name: "chatArea",
-    props: ['messages'],
+    data : function(){
+        return{
+            text:'',
+        }
+    },
+    props: {
+        messages: {
+            type: Array,
+            default: function(){
+                return [];
+            },
+        },
+    },
+    computed: {
+        roomMessages(){
+            var route = this.$route.params.roomId;
+            return this.messages.filter(function(obj) {
+                return obj.to === route;
+            })
+        }
+    },
+    methods: {
+        onSubmit(){
+            var unix = Math.round(+new Date()/1000);
+            const newMessage = {
+                from: "ali",
+                to: this.$route.params.roomId,
+                message: this.text,
+                timestamp: unix.toString(),
+            };
+            this.text = '';
+            fetch(API_URL,{
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(newMessage)
+            }).then((response) => {
+                console.log(response);
+            });
+        }
+    },
+    
 }
 </script>
 <style scoped>

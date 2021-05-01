@@ -19,7 +19,7 @@
             <input type="text" placeholder="search or start a new text">
         </div>
         <div class="sidebar_chats">
-        <contact v-for="message in messages" :key="message._id" v-bind:message ="message"></contact>
+        <contact v-for="(contact,idx) in Contacts" :key="idx" v-bind:contact ="contact"></contact>
         </div>
       
     </div>
@@ -30,7 +30,23 @@ import contact from './contact';
 
 export default {
     name: "contactArea",
-    props: ['messages'],
+     props: {
+        messages: {
+            type: Array,
+            default: function(){
+                return [];
+            },
+        },
+    },
+    computed: {
+        Contacts(){
+            const set = new Set();
+            for(const obj of this.messages){
+                set.add(obj.to);
+            }
+            return [...set];
+        }
+    },
     components: {
         contact,
     }

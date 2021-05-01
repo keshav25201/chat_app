@@ -1,4 +1,5 @@
 <template>
+    <router-link :to="`/rooms/${contact}`">
    <div class="contact">
     <v-avatar size='28'>
       <img
@@ -7,15 +8,21 @@
       >
     </v-avatar>
     <div class="contact-info">
-        <h2>{{message.name}}</h2>
+        <h2>{{contact}}</h2>
     </div>
    </div>
+   </router-link>
 </template>
 
 <script>
 export default {
     name: "contact",
-    props: ['message'],
+    props: ['contact'],
+    data: function(){
+        return {
+            goto : `rooms/${this.contact}`
+        }
+    }
 }
 </script>
 

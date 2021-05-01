@@ -1,33 +1,35 @@
 <template>
     <v-app>
-      <v-content>
+  
         <div class="app-body">
         <contactArea :messages='messages.messages'/>
-        <chatArea :messages='messages.messages'/>
+        <router-view :messages='messages.messages'/>
         </div>
-      </v-content>
+   
     </v-app>
 </template>
 
 <script>
-import chatArea from './components/chatArea';
-import contactArea from './components/contactArea';
 
+import contactArea from './components/contactArea';
+import { io } from "socket.io-client";
 const API_URL = 'http://localhost:3000/api/v1'; 
 
 export default {
   name: 'App',
 
   components: {
-    chatArea,
     contactArea
   },
 
   data: () => ({
     messages: [],
+    connection: null,
   }),
   created() {
     this.getMessages();
+    this.connection = io('http://localhost:3000',{ transports : ['websocket'] });
+    
   },
   methods: {
     getMessages() {
@@ -35,7 +37,6 @@ export default {
       .then(response => response.json())
       .then(data => {
         this.messages = data;
-        console.log(this.messages);
       })
       .catch(err => {
         console.log(err);

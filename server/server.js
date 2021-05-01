@@ -2,7 +2,12 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const morgan = require('morgan');
-const io = require('socket.io')(server);
+const io = require("socket.io")(server, {
+    cors: {
+      origin: "http://localhost:8080",
+      methods: ["GET", "POST"]
+    }
+  });
 const joi = require('joi');
 const cors = require('cors');
 //middleware
@@ -11,11 +16,10 @@ app.use(express.json());
 app.use(cors());
 //schema
 const schema = joi.object({
-    name: joi.string(),
+    from: joi.string(),
+    to: joi.string(),
     message: joi.string(),
     timestamp: joi.string(),
-    received: joi.boolean()
-
 });
 
 //db
@@ -36,18 +40,18 @@ app.post('/api/v1',(req,res) => {
     }
 })
 
-// io.on('connection',(socket) => {
-//     console.log('user connected');
-//     socket.on("send",(id,msg) => {
-//         socket.to(id).emit(msg);
-//     })
-//     socket.on("recieve",(msg) => {
-//         console.log(msg);
-//     })
-//     socket.on('disconnect',() => {
-//         console.log('user disconnected');
-//     })
-// });
+io.on('connection',(socket) => {
+    console.log('user connected');
+    socket.on("send",(id,msg) => {
+        socket.to(id).emit(msg);
+    })
+    socket.on("recieve",(msg) => {
+        console.log(msg);
+    })
+    socket.on('disconnect',() => {
+        console.log('user disconnected');
+    })
+});
 
 
 const PORT = process.env.PORT || 3000;
